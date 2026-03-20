@@ -1,1 +1,30 @@
+name: GitHub Access Audit
 
+on:
+  schedule:
+    - cron: '0 2 * * *'   # Runs daily at 2 AM UTC
+  workflow_dispatch:       # Manual trigger also allowed
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Run Audit Script
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x script.sh
+          ./script.sh
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-access-report
+          path: github_access_report.csv
